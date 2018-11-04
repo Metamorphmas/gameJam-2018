@@ -14,7 +14,8 @@ class GAMEJAM2018_API AGameJam2018GameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
-	
+public:
+	AGameJam2018GameModeBase();
 	
 	
 };
