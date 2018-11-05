@@ -49,22 +49,7 @@ APlayerCharacter::APlayerCharacter()
 	GunOffset = FVector(90.f, 0.f, 0.f);
 	FireRate = 0.1f;
 	bCanFire = true;
-	specialMovement = false;
-
-	APlayerCharacter::movementModes[0].speed = 1000.0f;
-	APlayerCharacter::movementModes[0].movementHandle = &APlayerCharacter::bipedMovement;
-	APlayerCharacter::movementModes[0].movementReset = &APlayerCharacter::bipedReset;
-	APlayerCharacter::movementModes[1].speed = 800.0f;
-	APlayerCharacter::movementModes[1].movementHandle = &APlayerCharacter::quadripedMovement;
-	APlayerCharacter::movementModes[1].movementReset = &APlayerCharacter::quadripedReset;
-	APlayerCharacter::movementModes[2].speed = 800.0f;
-	APlayerCharacter::movementModes[2].movementHandle = &APlayerCharacter::trackedMovement;
-	APlayerCharacter::movementModes[2].movementReset = &APlayerCharacter::trackedReset;
-
-	APlayerCharacter::movementMode = 1;
-
-	// Movement
-	MoveSpeed = movementModes[movementMode].speed;
+	legs = new Legs(1);
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -77,8 +62,8 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	PlayerInputComponent->BindAxis(FireForwardBinding);
 	PlayerInputComponent->BindAxis(FireRightBinding);
 
-	PlayerInputComponent->BindAction(MovementModifierBinding, IE_Pressed, this, APlayerCharacter::movementModes[movementMode].movementHandle);
-	PlayerInputComponent->BindAction(MovementModifierBinding, IE_Released, this, APlayerCharacter::movementModes[movementMode].movementReset);
+	PlayerInputComponent->BindAction(MovementModifierBinding, IE_Pressed, this, &APlayerCharacter::MovementModifierPressed);
+	PlayerInputComponent->BindAction(MovementModifierBinding, IE_Released, this, &APlayerCharacter::MovementModifierReleased);
 }
 
 void APlayerCharacter::Tick(float DeltaSeconds)
@@ -155,44 +140,12 @@ void APlayerCharacter::ShotTimerExpired()
 	bCanFire = true;
 }
 
-void APlayerCharacter::bipedMovement()
+void APlayerCharacter::MovementModifierPressed()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Biped"));
-	MoveSpeed = 1400.0f;
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Movement Pressed"));
 }
 
-void APlayerCharacter::bipedReset()
+void APlayerCharacter::MovementModifierReleased()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Biped ended"));
-	MoveSpeed = 1000.0f;
-}
-
-void APlayerCharacter::quadripedMovement()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Quadriped"));
-	if (specialMovement)
-	{
-		MoveSpeed = 800.0f;
-	}
-	else
-	{
-		MoveSpeed = 0.0f;
-	}
-
-	specialMovement = !specialMovement;
-}
-
-void APlayerCharacter::quadripedReset()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Quadriped ended"));
-}
-
-void APlayerCharacter::trackedMovement()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Tracked"));
-}
-
-void APlayerCharacter::trackedReset()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Tracked ended"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Movement Released"));
 }

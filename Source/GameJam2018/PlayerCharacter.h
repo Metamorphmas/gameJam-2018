@@ -4,13 +4,15 @@
 
 #include "Engine.h"
 #include "GameFramework/Pawn.h"
+#include "Legs.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
 class GAMEJAM2018_API APlayerCharacter : public APawn
 {
 	GENERATED_BODY()
-	
+
+private:
 	/* The mesh component */
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* CharacterMeshComponent;
@@ -23,16 +25,16 @@ class GAMEJAM2018_API APlayerCharacter : public APawn
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
+	/* Flag to control firing  */
+	uint32 bCanFire : 1;
+
+	/** Handle for efficient management of ShotTimerExpired timer */
+	FTimerHandle TimerHandle_ShotTimerExpired;
+
+	Legs *legs;
+
 
 public:
-	/**
-		0: Biped Model
-		1: Quadriped Model
-		2: Tracked Model
-	*/
-	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
-	int movementMode;
-
 	// Sets default values for this pawn's properties
 	APlayerCharacter();
 
@@ -71,45 +73,14 @@ public:
 
 	static const FName MovementModifierBinding;
 
-private:
+	void MovementModifierPressed();
+	void MovementModifierReleased();
 
-	
-
-	/* Flag to control firing  */
-	uint32 bCanFire : 1;
-
-	/** Handle for efficient management of ShotTimerExpired timer */
-	FTimerHandle TimerHandle_ShotTimerExpired;
-
-	bool specialMovement;
-
-	struct movementModel {
-		float speed;
-		void (APlayerCharacter::* movementHandle)();
-		void (APlayerCharacter::* movementReset)();
-	};
-
-	movementModel movementModes[3];
-
-	void bipedMovement();
-	void bipedReset();
-	void quadripedMovement();
-	void quadripedReset();
-	void trackedMovement();
-	void trackedReset();
-
-public:
 	/** Returns ShipMeshComponent subobject **/
 	FORCEINLINE class UStaticMeshComponent* GetShipMeshComponent() const { return CharacterMeshComponent; }
 	/** Returns CameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetCameraComponent() const { return CameraComponent; }
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-
-protected:
-	// Called when the game starts or when spawned
-	//virtual void BeginPlay() override;
-
-	
 	
 };
